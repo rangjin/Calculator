@@ -16,146 +16,32 @@ public class Calculator {
         this.remain = remain;
     }
 
-    public void evaluation() {
-        Vector<Element> stack = new Vector<>();
-
-        Element el;
-        Operand n, m, ans;
-        Operator op;
-
-        for (Element element : postfix) {
-            el = element;
-            if (el.getType() == 'n') {
-                stack.add(el);
-            } else {
-                n = (Operand) stack.remove(stack.size() - 1);
-                m = (Operand) stack.remove(stack.size() - 1);
-                op = (Operator) el;
-
-                op.calculate(m.getValue(), n.getValue());
-                ans = new Operand(op.getValue());
-
-                stack.add(ans);
-            }
-        }
-
-        el = stack.get(0);
-        ans = (Operand) el;
-
-        value = String.valueOf(ans.getValue());
+    public void setExpr() {
+        this.expr = (expression + "\0").toCharArray();
     }
 
     public char[] getExpr() {
         return this.expr;
     }
 
-    public void concat(char[] expr, int s, int e) {
-        e++;
-        char[] arr = new char[e - s];
-        System.arraycopy(expr, s, arr, 0, e - s);
-
-        expression = expression + String.valueOf(arr) + " ";
+    public void setTokens(Vector<Element> tokens) {
+        this.tokens = tokens;
     }
 
-    public void setExpr() {
-        this.expr = (expression + "\0").toCharArray();
+    public Vector<Element> getTokens() {
+        return this.tokens;
     }
 
-    public void makePostfix() {
-        Vector<Element> stack = new Vector<>();
-        Element t, s;
-
-        for (Element token : tokens) {
-            t = token;
-            switch (check(t.getType())) {
-                case 0:
-                    stack.add(t);
-                    break;
-                case 1:
-                    while (true) {
-                        s = stack.get(stack.size() - 1);
-                        if (check(s.getType()) == 0) {
-                            stack.remove(stack.size() - 1);
-                            break;
-                        } else {
-                            stack.remove(stack.size() - 1);
-                            postfix.add(s);
-                        }
-                    }
-                    break;
-                case 2:
-                case 3:
-                    while (true) {
-                        if (stack.size() == 0) {
-                            break;
-                        }
-                        s = stack.get(stack.size() - 1);
-                        if (check(s.getType()) == 0) {
-                            break;
-                        } else if (check(s.getType()) >= check(t.getType())) {
-                            stack.remove(stack.size() - 1);
-                            postfix.add(s);
-                        } else {
-                            break;
-                        }
-                    }
-                    stack.add(t);
-                    break;
-                case 4:
-                    postfix.add(t);
-                    break;
-            }
-        }
-
-        while (stack.size() != 0) {
-            s = stack.remove(stack.size() - 1);
-            postfix.add(s);
-        }
+    public void setValue(String value) {
+        this.value = value;
     }
 
-    public int check(char ch) {
-        if (ch == '(') {
-            return 0;
-        } else if (ch == ')') {
-            return 1;
-        } else if (ch == '+' || ch == '-') {
-            return 2;
-        } else if (ch == '*' || ch == '/') {
-            return 3;
-        } else {
-            return 4;
-        }
+    public String getValue() {
+        return this.value;
     }
 
-    public void putTokens(char[] expr, int s, int e) {
-        Element el = null;
-
-        char ch = categorize(expr[s]);
-
-        if (ch == 'o') {
-            el = new Open();
-        } else if (ch == 'c') {
-            el = new Close();
-        } else if (ch == 'n') {
-            char[] arr = new char[e - s];
-
-            System.arraycopy(expr, s, arr, 0, e - s);
-
-            String str = String.valueOf(arr);
-            el = new Operand(Double.parseDouble(str));
-        } else if (ch == 'e') {
-            if (expr[s] == '+') {
-                el = new Plus();
-            } else if (expr[s] == '-') {
-                el = new Minus();
-            } else if (expr[s] == '*') {
-                el = new Time();
-            } else {
-                el = new Div();
-            }
-        }
-
-        tokens.add(el);
+    public String getExpression() {
+        return expression;
     }
 
     public int checkError() {
@@ -373,27 +259,137 @@ public class Calculator {
         }
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void concat(char[] expr, int s, int e) {
+        e++;
+        char[] arr = new char[e - s];
+        System.arraycopy(expr, s, arr, 0, e - s);
+
+        expression = expression + String.valueOf(arr) + " ";
     }
 
-    public String getValue() {
-        return this.value;
+    public void putTokens(char[] expr, int s, int e) {
+        Element el = null;
+
+        char ch = categorize(expr[s]);
+
+        if (ch == 'o') {
+            el = new Open();
+        } else if (ch == 'c') {
+            el = new Close();
+        } else if (ch == 'n') {
+            char[] arr = new char[e - s];
+
+            System.arraycopy(expr, s, arr, 0, e - s);
+
+            String str = String.valueOf(arr);
+            el = new Operand(Double.parseDouble(str));
+        } else if (ch == 'e') {
+            if (expr[s] == '+') {
+                el = new Plus();
+            } else if (expr[s] == '-') {
+                el = new Minus();
+            } else if (expr[s] == '*') {
+                el = new Time();
+            } else {
+                el = new Div();
+            }
+        }
+
+        tokens.add(el);
     }
 
-    public void setTokens(Vector<Element> tokens) {
-        this.tokens = tokens;
+    public void makePostfix() {
+        Vector<Element> stack = new Vector<>();
+        Element t, s;
+
+        for (Element token : tokens) {
+            t = token;
+            switch (check(t.getType())) {
+                case 0:
+                    stack.add(t);
+                    break;
+                case 1:
+                    while (true) {
+                        s = stack.get(stack.size() - 1);
+                        if (check(s.getType()) == 0) {
+                            stack.remove(stack.size() - 1);
+                            break;
+                        } else {
+                            stack.remove(stack.size() - 1);
+                            postfix.add(s);
+                        }
+                    }
+                    break;
+                case 2:
+                case 3:
+                    while (true) {
+                        if (stack.size() == 0) {
+                            break;
+                        }
+                        s = stack.get(stack.size() - 1);
+                        if (check(s.getType()) == 0) {
+                            break;
+                        } else if (check(s.getType()) >= check(t.getType())) {
+                            stack.remove(stack.size() - 1);
+                            postfix.add(s);
+                        } else {
+                            break;
+                        }
+                    }
+                    stack.add(t);
+                    break;
+                case 4:
+                    postfix.add(t);
+                    break;
+            }
+        }
+
+        while (stack.size() != 0) {
+            s = stack.remove(stack.size() - 1);
+            postfix.add(s);
+        }
     }
 
-    public Vector<Element> getTokens() {
-        return this.tokens;
+    public int check(char ch) {
+        if (ch == '(') {
+            return 0;
+        } else if (ch == ')') {
+            return 1;
+        } else if (ch == '+' || ch == '-') {
+            return 2;
+        } else if (ch == '*' || ch == '/') {
+            return 3;
+        } else {
+            return 4;
+        }
     }
 
-    public void setPostfix(Vector<Element> postfix) {
-        this.postfix = postfix;
-    }
+    public void evaluation() {
+        Vector<Element> stack = new Vector<>();
 
-    public Vector<Element> getPostfix() {
-        return this.postfix;
+        Element el;
+        Operand n, m, ans;
+        Operator op;
+
+        for (Element element : postfix) {
+            el = element;
+            if (el.getType() == 'n') {
+                stack.add(el);
+            } else {
+                n = (Operand) stack.remove(stack.size() - 1);
+                m = (Operand) stack.remove(stack.size() - 1);
+                op = (Operator) el;
+
+                op.calculate(m.getValue(), n.getValue());
+                ans = new Operand(op.getValue());
+
+                stack.add(ans);
+            }
+        }
+
+        el = stack.get(0);
+        ans = (Operand) el;
+
+        value = String.valueOf(ans.getValue());
     }
 }
