@@ -1,6 +1,6 @@
 package Element;
 
-public class Operand implements Operate {
+public class Operand implements Element {
     private final double value;
     private final char type;
 

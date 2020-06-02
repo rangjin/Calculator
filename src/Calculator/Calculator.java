@@ -6,7 +6,7 @@ import java.util.*;
 public class Calculator {
     private char[] expr;
     private Vector<Element> tokens = new Vector<>();
-    private Vector<Element> postfix = new Vector<>();
+    private final Vector<Element> postfix = new Vector<>();
     private String value;
     private final String remain;
     private String expression = "";

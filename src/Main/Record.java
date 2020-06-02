@@ -150,8 +150,7 @@ public class Record {
                 }
             }
         } catch (FileNotFoundException e) {
-            System.out.println("File not exist");
-            return 0;
+            return 2;
         }
     }
 
@@ -164,6 +163,77 @@ public class Record {
             return "Hexadecimal";
         } else {
             return "Octal";
+        }
+    }
+
+    public static int deleteRecord(int n) throws IOException {
+        int num;
+        String str;
+
+        try {
+            FileReader fin = new FileReader(record);
+            BufferedReader br = new BufferedReader(fin);
+            FileWriter fout = new FileWriter(save);
+            BufferedWriter bw = new BufferedWriter(fout);
+            while (true) {
+                num = Integer.parseInt(br.readLine());
+                if (num == 0) {
+                    save.delete();
+                    fin.close();
+                    br.close();
+                    fout.close();
+                    bw.close();
+                    return 1;
+                } else {
+                    if (num == n) {
+                        br.readLine();
+                        br.readLine();
+                        br.readLine();
+
+                        while(true) {
+                            num = Integer.parseInt(br.readLine());
+                            if (num == 0) {
+                                bw.write(num + "\n");
+                                bw.flush();
+                                break;
+                            }
+                            bw.write((num - 1) + "\n" + br.readLine() + "\n" + br.readLine() + "\n" + br.readLine() + "\n");
+                            bw.flush();
+                        }
+
+                        fout.close();
+                        fin.close();
+                        bw.close();
+                        br.close();
+
+                        record.delete();
+
+                        fin = new FileReader(save);
+                        br = new BufferedReader(fin);
+                        fout = new FileWriter(record);
+                        bw = new BufferedWriter(fout);
+
+                        while ((str = br.readLine()) != null) {
+                            bw.write(str + "\n");
+                            bw.flush();
+                        }
+
+                        fout.close();
+                        fin.close();
+                        bw.close();
+                        br.close();
+
+                        save.delete();
+
+                        return 0;
+                    } else {
+                        bw.write(num + "\n" + br.readLine() + "\n" + br.readLine() + "\n" + br.readLine() + "\n");
+                        bw.flush();
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            return 2;
         }
     }
 }
