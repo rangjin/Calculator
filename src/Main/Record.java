@@ -3,8 +3,8 @@ package Main;
 import java.io.*;
 
 public class Record {
-    private static final File record = new File(".\\src\\Main\\record.txt");
-    private static final File save = new File(".\\src\\Main\\save.txt");
+    private static final File record = new File(".\\record.txt");
+    private static final File save = new File(".\\save.txt");
 
     public static void saveRecord(String expression, String remain, int mode) throws IOException {
         int num;
